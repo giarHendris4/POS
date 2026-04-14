@@ -19,10 +19,6 @@ return Application::configure(basePath: dirname(__DIR__))
             'super.admin' => \App\Http\Middleware\SuperAdminMiddleware::class,
             'branch.scope' => \App\Http\Middleware\BranchScopeMiddleware::class,
         ]);
-
-        $middleware->throttle('login', function ($request) {
-            return \Illuminate\Cache\RateLimiting\Limit::perMinute(5)->by($request->ip());
-        });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
