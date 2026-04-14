@@ -32,4 +32,29 @@ class SubscriptionPlan extends Model
     {
         return $this->hasMany(Tenant::class);
     }
+
+    public static function getCachedPlans()
+    {
+        return cache()->remember('subscription_plans', 3600, function () {
+            return self::where('is_active', true)
+                ->orderBy('sort_order')
+                ->get();
+        });
+    }
+
+    public static function clearCache()
+    {
+        cache()->forget('subscription_plans');
+    }
+
+    protected static function booted()
+    {
+        static::saved(function () {
+            self::clearCache();
+        });
+        
+        static::deleted(function () {
+            self::clearCache();
+        });
+    }
 }

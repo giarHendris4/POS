@@ -64,7 +64,7 @@ class History extends Component
     public function getTransactionsProperty()
     {
         $user = Auth::user();
-        $query = Transaction::with(['user', 'branch', 'items'])
+        $query = Transaction::with(['user', 'branch'])
             ->where('tenant_id', $user->tenant_id)
             ->where('status', 'completed');
 

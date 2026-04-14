@@ -38,6 +38,13 @@ class Scanner extends Component
 
     public function addToCart($barcode)
     {
+        $barcode = trim($barcode);
+        
+        if (empty($barcode)) {
+            session()->flash('error', 'Barcode tidak boleh kosong.');
+            return;
+        }
+        
         $tenantId = Auth::user()->tenant_id;
         
         $product = Product::where('tenant_id', $tenantId)
@@ -202,9 +209,16 @@ class Scanner extends Component
             return;
         }
 
-        if ($this->paymentMethod === 'cash' && $this->paymentAmount < $this->subtotal) {
-            session()->flash('error', 'Jumlah bayar kurang.');
-            return;
+        if ($this->paymentMethod === 'cash') {
+            if ($this->paymentAmount <= 0) {
+                session()->flash('error', 'Jumlah bayar tidak valid.');
+                return;
+            }
+            
+            if ($this->paymentAmount < $this->subtotal) {
+                session()->flash('error', 'Jumlah bayar kurang.');
+                return;
+            }
         }
 
         $this->dispatch('process-checkout', [
