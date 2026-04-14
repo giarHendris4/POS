@@ -1,4 +1,5 @@
 <div class="p-6 bg-gray-100 min-h-screen">
+    <div wire:loading class="fixed top-0 left-0 w-full h-1 bg-blue-500 animate-pulse"></div>
     <div class="max-w-7xl mx-auto">
         <div class="bg-white rounded-lg shadow-lg p-6">
             <h1 class="text-2xl font-bold mb-6">History Transaksi</h1>

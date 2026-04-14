@@ -73,11 +73,11 @@ class History extends Component
         }
 
         if ($this->filterType === 'today' && $this->selectedDate) {
-            $query->whereDate('transaction_date', $this->selectedDate);
+            $query->whereDate('transaction_date', Carbon::parse($this->selectedDate)->timezone('Asia/Jakarta')->toDateString());
         } elseif ($this->filterType === 'range' && $this->startDate && $this->endDate) {
             $query->whereBetween('transaction_date', [
-                Carbon::parse($this->startDate)->startOfDay(),
-                Carbon::parse($this->endDate)->endOfDay(),
+                Carbon::parse($this->startDate)->timezone('Asia/Jakarta')->startOfDay(),
+                Carbon::parse($this->endDate)->timezone('Asia/Jakarta')->endOfDay(),
             ]);
         }
 
@@ -95,11 +95,11 @@ class History extends Component
         }
 
         if ($this->filterType === 'today' && $this->selectedDate) {
-            $query->whereDate('transaction_date', $this->selectedDate);
+            $query->whereDate('transaction_date', Carbon::parse($this->selectedDate)->timezone('Asia/Jakarta')->toDateString());
         } elseif ($this->filterType === 'range' && $this->startDate && $this->endDate) {
             $query->whereBetween('transaction_date', [
-                Carbon::parse($this->startDate)->startOfDay(),
-                Carbon::parse($this->endDate)->endOfDay(),
+                Carbon::parse($this->startDate)->timezone('Asia/Jakarta')->startOfDay(),
+                Carbon::parse($this->endDate)->timezone('Asia/Jakarta')->endOfDay(),
             ]);
         }
 
@@ -117,11 +117,11 @@ class History extends Component
         }
 
         if ($this->filterType === 'today' && $this->selectedDate) {
-            $query->whereDate('transaction_date', $this->selectedDate);
+            $query->whereDate('transaction_date', Carbon::parse($this->selectedDate)->timezone('Asia/Jakarta')->toDateString());
         } elseif ($this->filterType === 'range' && $this->startDate && $this->endDate) {
             $query->whereBetween('transaction_date', [
-                Carbon::parse($this->startDate)->startOfDay(),
-                Carbon::parse($this->endDate)->endOfDay(),
+                Carbon::parse($this->startDate)->timezone('Asia/Jakarta')->startOfDay(),
+                Carbon::parse($this->endDate)->timezone('Asia/Jakarta')->endOfDay(),
             ]);
         }
 

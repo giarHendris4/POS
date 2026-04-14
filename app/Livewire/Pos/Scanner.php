@@ -28,6 +28,7 @@ class Scanner extends Component
         'productAdded' => 'refreshCart',
         'checkoutComplete' => 'handleCheckoutComplete',
         'checkout-error' => 'handleCheckoutError',
+        'force-clear-cart' => 'forceClearCart',
     ];
 
     public function mount()
@@ -153,6 +154,15 @@ class Scanner extends Component
 
     public function clearCart()
     {
+        if ($this->totalItems === 0) {
+            return;
+        }
+        
+        $this->dispatch('confirm-clear-cart');
+    }
+
+    public function forceClearCart()
+    {
         $tenantId = Auth::user()->tenant_id;
         $userId = Auth::id();
         $sessionId = session()->getId();
@@ -165,6 +175,7 @@ class Scanner extends Component
             ->delete();
 
         $this->loadCart();
+        session()->flash('info', 'Keranjang dikosongkan.');
     }
 
     public function openPaymentModal()
@@ -212,9 +223,13 @@ class Scanner extends Component
             'newProductSellingPrice' => 'required|numeric|min:0',
         ]);
 
+        if (empty($this->newProductBarcode)) {
+            session()->flash('error', 'Barcode tidak boleh kosong.');
+            return;
+        }
+
         $tenantId = Auth::user()->tenant_id;
 
-        // Cek barcode sudah ada
         $existing = Product::where('tenant_id', $tenantId)
             ->where('barcode', $this->newProductBarcode)
             ->exists();
@@ -236,11 +251,11 @@ class Scanner extends Component
         ]);
 
         $this->showQuickAddModal = false;
-        $this->newProductName = '';
-        $this->newProductCostPrice = 0;
-        $this->newProductSellingPrice = 0;
+        $this->reset(['newProductName', 'newProductCostPrice', 'newProductSellingPrice']);
 
         $this->addProductToCart($product);
+        
+        session()->flash('success', 'Produk berhasil ditambahkan.');
     }
 
     public function resetCart()

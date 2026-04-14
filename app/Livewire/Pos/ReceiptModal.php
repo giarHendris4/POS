@@ -38,6 +38,11 @@ class ReceiptModal extends Component
 
     public function printBluetooth()
     {
+        if (!$this->transaction) {
+            session()->flash('error', 'Data transaksi tidak ditemukan.');
+            return;
+        }
+        
         $printerService = new ThermalPrinterService($this->transaction);
         $printerService->savePrintedReceipt();
         
@@ -48,6 +53,11 @@ class ReceiptModal extends Component
 
     public function printUsb()
     {
+        if (!$this->transaction) {
+            session()->flash('error', 'Data transaksi tidak ditemukan.');
+            return;
+        }
+        
         $printerService = new ThermalPrinterService($this->transaction);
         $printerService->savePrintedReceipt();
         
@@ -58,6 +68,11 @@ class ReceiptModal extends Component
 
     public function downloadTxt()
     {
+        if (!$this->transaction) {
+            session()->flash('error', 'Data transaksi tidak ditemukan.');
+            return;
+        }
+        
         $printerService = new ThermalPrinterService($this->transaction);
         $printerService->savePrintedReceipt();
         
@@ -79,12 +94,26 @@ class ReceiptModal extends Component
 
     protected function detectBluetoothSupport(): bool
     {
-        return true;
+        return isset($_SERVER['HTTP_USER_AGENT']) && 
+               (strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome') !== false ||
+                strpos($_SERVER['HTTP_USER_AGENT'], 'Edge') !== false);
     }
 
     protected function detectUsbSupport(): bool
     {
-        return true;
+        return isset($_SERVER['HTTP_USER_AGENT']) && 
+               (strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome') !== false ||
+                strpos($_SERVER['HTTP_USER_AGENT'], 'Edge') !== false);
+    }
+
+    public function getCanPrintBluetoothProperty(): bool
+    {
+        return $this->detectBluetoothSupport();
+    }
+
+    public function getCanPrintUsbProperty(): bool
+    {
+        return $this->detectUsbSupport();
     }
 
     public function render()

@@ -215,6 +215,12 @@
                     }
                 }, 100);
             });
+
+            Livewire.on('confirm-clear-cart', () => {
+                if (confirm('Yakin ingin mengosongkan keranjang?')) {
+                    Livewire.dispatch('force-clear-cart');
+                }
+            });
         });
     </script>
 
