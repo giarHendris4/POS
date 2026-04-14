@@ -45,6 +45,7 @@ class SubscriptionPlan extends Model
     public static function clearCache()
     {
         cache()->forget('subscription_plans');
+        cache()->forget('subscription_plans_active');
     }
 
     protected static function booted()

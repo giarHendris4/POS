@@ -8,6 +8,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/subscription/expired', function () {
+    return view('subscription.expired');
+})->name('subscription.expired');
+
 // Protected routes with tenant middleware
 Route::middleware([
     'auth:sanctum',
