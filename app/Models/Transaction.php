@@ -3,15 +3,17 @@
 namespace App\Models;
 
 use App\Traits\BelongsToTenant;
+use App\Traits\BelongsToBranch;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Transaction extends Model
 {
-    use SoftDeletes, BelongsToTenant;
+    use SoftDeletes, BelongsToTenant, BelongsToBranch;
 
     protected $fillable = [
         'tenant_id',
+        'branch_id',
         'invoice_number',
         'user_id',
         'customer_id',
@@ -55,5 +57,10 @@ class Transaction extends Model
     public function items()
     {
         return $this->hasMany(TransactionItem::class);
+    }
+
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
     }
 }

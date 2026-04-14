@@ -4,7 +4,7 @@
 **Priority:** Critical
 **Assignee:** Windsurf (via prompt)
 **Reviewer:** Senior Engineer
-**Depends On:** Issue #1 ✅
+**Depends On:** Issue #1 
 
 ## Deskripsi
 Setup authentication dengan Laravel Jetstream (Livewire stack), implementasi multi-tenancy middleware untuk isolasi data per tenant, dan tenant registration flow dengan trial subscription.

@@ -16,7 +16,13 @@ return Application::configure(basePath: dirname(__DIR__))
             'tenant' => \App\Http\Middleware\TenantMiddleware::class,
             'tenant.scope' => \App\Http\Middleware\TenantScopeMiddleware::class,
             'role' => \App\Http\Middleware\RoleMiddleware::class,
+            'super.admin' => \App\Http\Middleware\SuperAdminMiddleware::class,
+            'branch.scope' => \App\Http\Middleware\BranchScopeMiddleware::class,
         ]);
+
+        $middleware->throttle('login', function ($request) {
+            return \Illuminate\Cache\RateLimiting\Limit::perMinute(5)->by($request->ip());
+        });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

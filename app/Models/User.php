@@ -4,9 +4,11 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Tenant;
+use App\Models\Branch;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
@@ -16,7 +18,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens;
+    use HasApiTokens, SoftDeletes;
 
     /** @use HasFactory<UserFactory> */
     use HasFactory;
@@ -36,10 +38,12 @@ class User extends Authenticatable
         'email',
         'password',
         'tenant_id',
+        'branch_id',
         'role',
         'phone',
         'photo_path',
         'is_active',
+        'deleted_at',
     ];
 
     /**
@@ -74,6 +78,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_active' => 'boolean',
+            'deleted_at' => 'datetime',
         ];
     }
 
@@ -99,5 +104,15 @@ class User extends Authenticatable
         }
         
         return $this->tenant_id === $tenant;
+    }
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'super_admin';
     }
 }
