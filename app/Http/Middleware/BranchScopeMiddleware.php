@@ -33,6 +33,7 @@ class BranchScopeMiddleware
 
         // Share current branch to views
         if ($user->branch_id) {
+            $user->load('branch');
             view()->share('currentBranch', $user->branch);
         }
 

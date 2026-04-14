@@ -49,6 +49,15 @@ class TransactionService
         $tenantId = $user->tenant_id;
         $branchId = $user->branch_id;
 
+        // VALIDASI STOK TERLEBIH DAHULU - SEBELUM TRANSACTION CREATE
+        foreach ($this->cartItems as $cartItem) {
+            $product = Product::find($cartItem->product_id);
+            
+            if ($product->current_stock < $cartItem->quantity) {
+                throw new \Exception("Stok produk {$product->name} tidak mencukupi. Tersedia: {$product->current_stock}");
+            }
+        }
+
         return DB::transaction(function () use ($tenantId, $branchId, $paymentData, $user) {
             $transaction = Transaction::create([
                 'tenant_id' => $tenantId,
@@ -71,11 +80,6 @@ class TransactionService
 
             foreach ($this->cartItems as $cartItem) {
                 $product = Product::find($cartItem->product_id);
-                
-                // VALIDASI STOK
-                if ($product->current_stock < $cartItem->quantity) {
-                    throw new \Exception("Stok produk {$product->name} tidak mencukupi. Tersedia: {$product->current_stock}");
-                }
                 
                 $costPriceSnapshot = $product->cost_price;
                 $unitPriceSnapshot = $cartItem->unit_price;
