@@ -4,6 +4,7 @@ namespace App\Actions\Fortify;
 
 use App\Models\Team;
 use App\Models\User;
+use App\Models\Tenant;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -14,34 +15,44 @@ class CreateNewUser implements CreatesNewUsers
 {
     use PasswordValidationRules;
 
-    /**
-     * Create a newly registered user.
-     *
-     * @param  array<string, string>  $input
-     */
     public function create(array $input): User
     {
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => $this->passwordRules(),
+            'tenant_name' => ['required', 'string', 'max:255'],
+            'phone' => ['nullable', 'string', 'max:20'],
             'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
         ])->validate();
 
         return DB::transaction(function () use ($input) {
-            return tap(User::create([
+            // Create tenant
+            $tenant = Tenant::create([
+                'name' => $input['tenant_name'],
+                'slug' => \Illuminate\Support\Str::slug($input['tenant_name']),
+                'phone' => $input['phone'] ?? null,
+                'is_active' => true,
+                'trial_ends_at' => now()->addDays(14),
+            ]);
+
+            // Create user as owner
+            $user = User::create([
                 'name' => $input['name'],
                 'email' => $input['email'],
                 'password' => Hash::make($input['password']),
-            ]), function (User $user) {
-                $this->createTeam($user);
-            });
+                'tenant_id' => $tenant->id,
+                'role' => 'owner',
+                'phone' => $input['phone'] ?? null,
+                'is_active' => true,
+            ]);
+
+            $this->createTeam($user);
+
+            return $user;
         });
     }
 
-    /**
-     * Create a personal team for the user.
-     */
     protected function createTeam(User $user): void
     {
         $user->ownedTeams()->save(Team::forceCreate([

@@ -14,6 +14,18 @@
                 <x-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
             </div>
 
+            <!-- Tenant Name -->
+            <div class="mt-4">
+                <x-label for="tenant_name" value="{{ __('Nama Warung / Toko') }}" />
+                <x-input id="tenant_name" class="block mt-1 w-full" type="text" name="tenant_name" :value="old('tenant_name')" required autofocus />
+            </div>
+
+            <!-- Phone -->
+            <div class="mt-4">
+                <x-label for="phone" value="{{ __('Nomor Telepon') }}" />
+                <x-input id="phone" class="block mt-1 w-full" type="text" name="phone" :value="old('phone')" />
+            </div>
+
             <div class="mt-4">
                 <x-label for="email" value="{{ __('Email') }}" />
                 <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />

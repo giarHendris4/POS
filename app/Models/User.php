@@ -3,8 +3,10 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Tenant;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
@@ -33,6 +35,11 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'tenant_id',
+        'role',
+        'phone',
+        'photo_path',
+        'is_active',
     ];
 
     /**
@@ -66,6 +73,31 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
         ];
+    }
+
+    public function tenant(): BelongsTo
+    {
+        return $this->belongsTo(Tenant::class);
+    }
+
+    public function isOwner(): bool
+    {
+        return $this->role === 'owner';
+    }
+
+    public function isCashier(): bool
+    {
+        return $this->role === 'cashier';
+    }
+
+    public function belongsToTenant(Tenant|int|null $tenant = null): bool
+    {
+        if ($tenant instanceof Tenant) {
+            return $this->tenant_id === $tenant->id;
+        }
+        
+        return $this->tenant_id === $tenant;
     }
 }
