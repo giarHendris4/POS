@@ -26,9 +26,13 @@ class TenantMiddleware
         $tenant = $user->tenant;
 
         if (!$tenant || !$tenant->isActive()) {
+            if ($tenant && !$tenant->isActive()) {
+                return redirect()->route('subscription.expired');
+            }
+            
             Auth::logout();
             return redirect()->route('login')->withErrors([
-                'email' => 'Langganan telah berakhir. Silakan hubungi admin.',
+                'email' => 'Akun tidak terasosiasi dengan tenant.',
             ]);
         }
 
