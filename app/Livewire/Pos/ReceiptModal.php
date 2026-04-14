@@ -61,7 +61,13 @@ class ReceiptModal extends Component
         $printerService = new ThermalPrinterService($this->transaction);
         $printerService->savePrintedReceipt();
         
-        return $printerService->downloadAsText();
+        $content = $printerService->generateReceipt();
+        $filename = 'struk-' . $this->transaction->invoice_number . '.txt';
+        
+        $this->dispatch('download-receipt', [
+            'content' => $content,
+            'filename' => $filename,
+        ]);
     }
 
     public function closeModal()

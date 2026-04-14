@@ -17,9 +17,9 @@
                class="w-full p-4 text-lg border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
                placeholder="Scan barcode di sini..."
                autofocus
-               x-data
-               x-init="document.getElementById('barcode-input').focus()"
-               wire:keydown.enter="addToCart($event.target.value)">
+               x-ref="barcodeInput"
+               wire:keydown.enter="addToCart($event.target.value)"
+               x-init="$refs.barcodeInput.focus()">
     </div>
 
     {{-- Cart Items --}}
@@ -199,7 +199,20 @@
         document.addEventListener('livewire:initialized', () => {
             Livewire.on('cart-updated', () => {
                 setTimeout(() => {
-                    document.getElementById('barcode-input').focus();
+                    const input = document.getElementById('barcode-input');
+                    if (input) {
+                        input.focus();
+                        input.value = '';
+                    }
+                }, 50);
+            });
+            
+            Livewire.on('checkout-complete', () => {
+                setTimeout(() => {
+                    const input = document.getElementById('barcode-input');
+                    if (input) {
+                        input.focus();
+                    }
                 }, 100);
             });
         });

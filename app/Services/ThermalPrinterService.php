@@ -143,7 +143,7 @@ class ThermalPrinterService
         ]);
     }
 
-    public function downloadAsText(): string
+    public function downloadAsText(): \Illuminate\Http\Response
     {
         $content = $this->generateReceipt();
         $filename = 'struk-' . $this->transaction->invoice_number . '.txt';

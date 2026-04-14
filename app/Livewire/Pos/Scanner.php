@@ -213,7 +213,16 @@ class Scanner extends Component
         ]);
 
         $tenantId = Auth::user()->tenant_id;
-        $branchId = Auth::user()->branch_id;
+
+        // Cek barcode sudah ada
+        $existing = Product::where('tenant_id', $tenantId)
+            ->where('barcode', $this->newProductBarcode)
+            ->exists();
+
+        if ($existing) {
+            session()->flash('error', 'Barcode sudah terdaftar.');
+            return;
+        }
 
         $product = Product::create([
             'tenant_id' => $tenantId,
@@ -222,6 +231,7 @@ class Scanner extends Component
             'cost_price' => $this->newProductCostPrice,
             'selling_price' => $this->newProductSellingPrice,
             'current_stock' => 1,
+            'min_stock_alert' => 5,
             'is_active' => true,
         ]);
 

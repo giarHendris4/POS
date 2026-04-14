@@ -72,6 +72,11 @@ class TransactionService
             foreach ($this->cartItems as $cartItem) {
                 $product = Product::find($cartItem->product_id);
                 
+                // VALIDASI STOK
+                if ($product->current_stock < $cartItem->quantity) {
+                    throw new \Exception("Stok produk {$product->name} tidak mencukupi. Tersedia: {$product->current_stock}");
+                }
+                
                 $costPriceSnapshot = $product->cost_price;
                 $unitPriceSnapshot = $cartItem->unit_price;
 

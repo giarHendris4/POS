@@ -77,6 +77,18 @@ document.addEventListener('livewire:initialized', () => {
             alert('Browser tidak mendukung Web Serial. Gunakan Download TXT.');
         }
     });
+
+    Livewire.on('download-receipt', (data) => {
+        const blob = new Blob([data.content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = data.filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    });
 });
 </script>
 @endif
