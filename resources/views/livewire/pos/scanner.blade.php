@@ -204,4 +204,7 @@
             });
         });
     </script>
+
+    {{-- Receipt Modal --}}
+    <livewire:pos.receipt-modal />
 </div>

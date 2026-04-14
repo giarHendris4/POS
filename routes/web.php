@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Pos\Scanner;
+use App\Livewire\Transactions\History;
 
 Route::get('/', function () {
     return view('welcome');
@@ -52,6 +53,8 @@ Route::middleware([
         Route::get('/settings/branches', function () {
             return view('settings.branches');
         })->name('settings.branches');
+        
+        Route::get('/transactions/history', History::class)->name('transactions.history');
     });
 });
 
