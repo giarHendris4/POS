@@ -1,6 +1,6 @@
 # Issue #2: Authentication & Multi-Tenancy Middleware
 
-**Status:** 🔄 In Progress
+**Status:** ✅ Completed
 **Priority:** Critical
 **Assignee:** Windsurf (via prompt)
 **Reviewer:** Senior Engineer
@@ -12,37 +12,37 @@ Setup authentication dengan Laravel Jetstream (Livewire stack), implementasi mul
 ## Tasks Checklist
 
 ### Phase 2.1: Authentication Setup
-- [ ] Install Jetstream dengan Livewire (sudah dari Issue #1)
-- [ ] Setup authentication views (login, register, dashboard)
-- [ ] Customize registration form (tambah field: tenant_name, phone)
-- [ ] Create Tenant model and relationships
-- [ ] Auto-create tenant saat user register
-- [ ] Set trial subscription (14 hari default)
+- [x] Install Jetstream dengan Livewire (sudah dari Issue #1)
+- [x] Setup authentication views (login, register, dashboard)
+- [x] Customize registration form (tambah field: tenant_name, phone)
+- [x] Create Tenant model and relationships
+- [x] Auto-create tenant saat user register
+- [x] Set trial subscription (14 hari default)
 
 ### Phase 2.2: Multi-Tenancy Middleware
-- [ ] Create `TenantMiddleware` 
-- [ ] Auto-set tenant_id dari authenticated user
-- [ ] Scope semua query ke current tenant
-- [ ] Global scope trait `BelongsToTenant` 
+- [x] Create `TenantMiddleware`
+- [x] Auto-set tenant_id dari authenticated user
+- [x] Scope semua query ke current tenant
+- [x] Global scope trait `BelongsToTenant`
 
 ### Phase 2.3: Role-Based Access
-- [ ] Tambah kolom `role` di users table (sudah dari Issue #1)
-- [ ] Create `RoleMiddleware` untuk proteksi route owner-only
-- [ ] Gate policies untuk authorization
+- [x] Tambah kolom `role` di users table (sudah dari Issue #1)
+- [x] Create `RoleMiddleware` untuk proteksi route owner-only
+- [x] Gate policies untuk authorization
 
 ### Phase 2.4: Testing
-- [ ] Unit test untuk registration flow
-- [ ] Unit test untuk tenant isolation
-- [ ] Unit test untuk role middleware
+- [x] Unit test untuk registration flow
+- [x] Unit test untuk tenant isolation
+- [x] Unit test untuk role middleware
 
 ## Definition of Done
 
-- [ ] User bisa register dan otomatis mendapat tenant
-- [ ] Trial subscription 14 hari otomatis terpasang
-- [ ] Data terisolasi per tenant (user A tidak bisa lihat data tenant B)
-- [ ] Owner bisa invite cashier ke tenant
-- [ ] Semua unit test passing
-- [ ] Git commit & push
+- [x] User bisa register dan otomatis mendapat tenant
+- [x] Trial subscription 14 hari otomatis terpasang
+- [x] Data terisolasi per tenant (user A tidak bisa lihat data tenant B)
+- [x] Owner bisa invite cashier ke tenant
+- [x] Semua unit test passing
+- [x] Git commit & push
 
 ## Technical Specifications
 
