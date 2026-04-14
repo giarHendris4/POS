@@ -26,7 +26,8 @@ class Scanner extends Component
     protected $listeners = [
         'barcodeScanned' => 'addToCart',
         'productAdded' => 'refreshCart',
-        'checkoutComplete' => 'resetCart',
+        'checkoutComplete' => 'handleCheckoutComplete',
+        'checkout-error' => 'handleCheckoutError',
     ];
 
     public function mount()
@@ -185,7 +186,12 @@ class Scanner extends Component
 
     public function processPayment()
     {
-        if ($this->paymentAmount < $this->subtotal && $this->paymentMethod === 'cash') {
+        if ($this->totalItems === 0) {
+            session()->flash('error', 'Keranjang masih kosong.');
+            return;
+        }
+
+        if ($this->paymentMethod === 'cash' && $this->paymentAmount < $this->subtotal) {
             session()->flash('error', 'Jumlah bayar kurang.');
             return;
         }
@@ -233,6 +239,22 @@ class Scanner extends Component
         $this->paymentAmount = 0;
         $this->changeAmount = 0;
         $this->barcode = '';
+    }
+
+    public function handleCheckoutComplete($data)
+    {
+        $this->resetCart();
+        $this->showPaymentModal = false;
+        
+        session()->flash('success', "Transaksi berhasil! Invoice: {$data['invoice_number']}");
+        
+        $this->dispatch('show-receipt', $data);
+    }
+
+    public function handleCheckoutError($message)
+    {
+        session()->flash('error', $message);
+        $this->showPaymentModal = false;
     }
 
     public function refreshCart()

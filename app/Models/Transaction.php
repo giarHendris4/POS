@@ -6,6 +6,7 @@ use App\Traits\BelongsToTenant;
 use App\Traits\BelongsToBranch;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\CashFlow;
 
 class Transaction extends Model
 {
@@ -62,5 +63,29 @@ class Transaction extends Model
     public function branch()
     {
         return $this->belongsTo(Branch::class);
+    }
+
+    protected static function booted()
+    {
+        static::created(function ($transaction) {
+            if ($transaction->status === 'completed') {
+                $previousBalance = CashFlow::where('tenant_id', $transaction->tenant_id)
+                    ->orderBy('id', 'desc')
+                    ->value('balance_after') ?? 0;
+
+                CashFlow::create([
+                    'tenant_id' => $transaction->tenant_id,
+                    'transaction_id' => $transaction->id,
+                    'user_id' => $transaction->user_id,
+                    'type' => 'debit',
+                    'category' => 'sale',
+                    'amount' => $transaction->grand_total,
+                    'balance_before' => $previousBalance,
+                    'balance_after' => $previousBalance + $transaction->grand_total,
+                    'description' => "Penjualan #{$transaction->invoice_number}",
+                    'cash_flow_date' => $transaction->transaction_date,
+                ]);
+            }
+        });
     }
 }

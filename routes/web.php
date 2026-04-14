@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Livewire\Pos\Scanner;
 
 Route::get('/', function () {
     return view('welcome');
@@ -19,9 +20,7 @@ Route::middleware([
         return view('dashboard');
     })->name('dashboard');
     
-    Route::get('/pos', function () {
-        return view('pos.index');
-    })->name('pos.index');
+    Route::get('/pos', Scanner::class)->name('pos.index');
     
     Route::get('/products', function () {
         return view('products.index');
