@@ -204,3 +204,4 @@
     <livewire:pos.receipt-modal />
     </div>
 </div>
+</div>
