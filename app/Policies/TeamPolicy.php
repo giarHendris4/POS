@@ -23,7 +23,8 @@ class TeamPolicy
      */
     public function view(User $user, Team $team): bool
     {
-        return $user->belongsToTeam($team);
+        return $user->belongsToTeam($team) &&
+               ($user->tenant_id === $team->tenant_id || $user->isSuperAdmin());
     }
 
     /**
@@ -39,7 +40,8 @@ class TeamPolicy
      */
     public function update(User $user, Team $team): bool
     {
-        return $user->ownsTeam($team);
+        return $user->ownsTeam($team) &&
+               ($user->tenant_id === $team->tenant_id || $user->isSuperAdmin());
     }
 
     /**
@@ -71,6 +73,7 @@ class TeamPolicy
      */
     public function delete(User $user, Team $team): bool
     {
-        return $user->ownsTeam($team);
+        return $user->ownsTeam($team) &&
+               ($user->tenant_id === $team->tenant_id || $user->isSuperAdmin());
     }
 }

@@ -22,6 +22,7 @@ class Team extends JetstreamTeam
     protected $fillable = [
         'name',
         'personal_team',
+        'tenant_id',
     ];
 
     /**
@@ -45,5 +46,10 @@ class Team extends JetstreamTeam
         return [
             'personal_team' => 'boolean',
         ];
+    }
+
+    public function tenant()
+    {
+        return $this->belongsTo(Tenant::class);
     }
 }
