@@ -34,7 +34,7 @@
                             <i class="fas fa-envelope text-gray-400 mr-1"></i>Email
                         </label>
                         <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus
-                               class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 outline-none transition"
+                               class="w-full px-4 py-3 text-black border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 outline-none transition"
                                placeholder="contoh@email.com">
                     </div>
 
@@ -44,7 +44,7 @@
                             <i class="fas fa-lock text-gray-400 mr-1"></i>Password
                         </label>
                         <input id="password" type="password" name="password" required
-                               class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 outline-none transition"
+                               class="w-full px-4 py-3 text-black border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 outline-none transition"
                                placeholder="••••••••">
                     </div>
 
