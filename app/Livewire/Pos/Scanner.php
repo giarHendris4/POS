@@ -266,6 +266,7 @@ class Scanner extends Component
 
         $this->showQuickAddModal = false;
         $this->reset(['newProductName', 'newProductCostPrice', 'newProductSellingPrice']);
+        $this->barcode = '';
 
         $this->addProductToCart($product);
         

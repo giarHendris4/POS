@@ -102,8 +102,8 @@
 
     {{-- Payment Modal --}}
     @if($showPaymentModal)
-    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white rounded-lg w-96 p-6">
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" wire:click="$set('showPaymentModal', false)">
+        <div class="bg-white rounded-lg w-96 p-6" wire:click.stop>
             <h2 class="text-xl font-bold mb-4">Pembayaran</h2>
             
             <div class="mb-4">
@@ -157,8 +157,8 @@
 
     {{-- Quick Add Product Modal --}}
     @if($showQuickAddModal)
-    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white rounded-lg w-96 p-6">
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" wire:click="$set('showQuickAddModal', false)">
+        <div class="bg-white rounded-lg w-96 p-6" wire:click.stop>
             <h2 class="text-xl font-bold mb-4">Tambah Produk Baru</h2>
             <p class="text-sm text-gray-600 mb-4">Barcode: {{ $newProductBarcode }}</p>
             

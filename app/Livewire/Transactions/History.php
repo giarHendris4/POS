@@ -29,6 +29,10 @@ class History extends Component
     {
         $this->startDate = now()->startOfMonth()->format('Y-m-d');
         $this->endDate = now()->format('Y-m-d');
+        
+        if ($this->filterType === 'today' && empty($this->selectedDate)) {
+            $this->selectedDate = now()->format('Y-m-d');
+        }
     }
 
     public function updatedFilterType()

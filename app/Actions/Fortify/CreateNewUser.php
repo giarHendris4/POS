@@ -27,10 +27,19 @@ class CreateNewUser implements CreatesNewUsers
         ])->validate();
 
         return DB::transaction(function () use ($input) {
-            // Create tenant
+            // Create tenant with unique slug
+            $baseSlug = \Illuminate\Support\Str::slug($input['tenant_name']);
+            $slug = $baseSlug;
+            $counter = 1;
+
+            while (Tenant::where('slug', $slug)->exists()) {
+                $slug = $baseSlug . '-' . $counter;
+                $counter++;
+            }
+
             $tenant = Tenant::create([
                 'name' => $input['tenant_name'],
-                'slug' => \Illuminate\Support\Str::slug($input['tenant_name']),
+                'slug' => $slug,
                 'phone' => $input['phone'] ?? null,
                 'is_active' => true,
                 'trial_ends_at' => now()->addDays(14),

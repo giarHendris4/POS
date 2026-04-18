@@ -1,6 +1,6 @@
 @if($showModal && $transaction)
-<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg w-[400px] max-h-[80vh] overflow-hidden">
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" wire:click="closeModal">
+    <div class="bg-white rounded-lg w-[400px] max-h-[80vh] overflow-hidden" wire:click.stop>
         <div class="p-4 border-b">
             <h2 class="text-lg font-bold">Struk Transaksi</h2>
             <p class="text-sm text-gray-600">{{ $transaction->invoice_number }}</p>
