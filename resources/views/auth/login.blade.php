@@ -15,7 +15,11 @@
             </div>
 
             <!-- Session Status -->
-            <x-authentication-session-status class="mb-4" :status="session('status')" />
+            @if (session('status'))
+                <div class="mb-4 p-4 bg-green-50 border border-green-200 rounded-xl text-sm text-green-700">
+                    <i class="fas fa-check-circle mr-2"></i>{{ session('status') }}
+                </div>
+            @endif
 
             <!-- Login Form -->
             <div class="bg-white rounded-2xl shadow-xl p-6 sm:p-8">

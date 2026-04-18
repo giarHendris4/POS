@@ -13,7 +13,11 @@
             </div>
 
             <!-- Session Status -->
-            <x-authentication-session-status class="mb-4" :status="session('status')" />
+            @if (session('status'))
+                <div class="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700">
+                    {{ session('status') }}
+                </div>
+            @endif
 
             <!-- Forgot Password Form -->
             <div class="bg-white rounded-2xl shadow-xl p-6 sm:p-8">
