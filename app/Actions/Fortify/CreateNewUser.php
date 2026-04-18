@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
 use Laravel\Jetstream\Jetstream;
+use Illuminate\Database\QueryException;
 
 class CreateNewUser implements CreatesNewUsers
 {
@@ -27,23 +28,44 @@ class CreateNewUser implements CreatesNewUsers
         ])->validate();
 
         return DB::transaction(function () use ($input) {
-            // Create tenant with unique slug
+            // Create tenant with unique slug - with retry logic for race condition
             $baseSlug = \Illuminate\Support\Str::slug($input['tenant_name']);
             $slug = $baseSlug;
-            $counter = 1;
+            $maxAttempts = 5;
+            $attempt = 0;
+            $tenant = null;
 
-            while (Tenant::where('slug', $slug)->exists()) {
-                $slug = $baseSlug . '-' . $counter;
-                $counter++;
+            while ($attempt < $maxAttempts) {
+                try {
+                    $tenant = Tenant::create([
+                        'name' => $input['tenant_name'],
+                        'slug' => $slug,
+                        'phone' => $input['phone'] ?? null,
+                        'is_active' => true,
+                        'trial_ends_at' => now()->addDays(14),
+                    ]);
+                    break;
+                } catch (\Illuminate\Database\QueryException $e) {
+                    // Check if it's a duplicate entry error (MySQL error 1062, SQLite error 19)
+                    $isDuplicateError = str_contains($e->getMessage(), 'Duplicate entry') || 
+                                       str_contains($e->getMessage(), 'UNIQUE constraint failed');
+                    
+                    if ($isDuplicateError) {
+                        $attempt++;
+                        $slug = $baseSlug . '-' . ($attempt + 1);
+                        
+                        if ($attempt >= $maxAttempts) {
+                            throw new \Exception('Gagal membuat tenant. Silakan coba lagi dengan nama yang berbeda.');
+                        }
+                    } else {
+                        throw $e;
+                    }
+                }
             }
 
-            $tenant = Tenant::create([
-                'name' => $input['tenant_name'],
-                'slug' => $slug,
-                'phone' => $input['phone'] ?? null,
-                'is_active' => true,
-                'trial_ends_at' => now()->addDays(14),
-            ]);
+            if (!$tenant) {
+                throw new \Exception('Gagal membuat tenant. Silakan coba lagi.');
+            }
 
             // Create user as owner
             $user = User::create([

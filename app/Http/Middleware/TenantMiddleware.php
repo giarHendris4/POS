@@ -23,6 +23,8 @@ class TenantMiddleware
             ]);
         }
 
+        // Eager load tenant untuk mencegah N+1 query
+        $user->load('tenant');
         $tenant = $user->tenant;
 
         if (!$tenant || !$tenant->isActive()) {
