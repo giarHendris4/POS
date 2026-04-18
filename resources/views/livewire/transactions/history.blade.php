@@ -1,4 +1,5 @@
-<div class="min-h-screen bg-gray-50">
+<div>
+    <div class="min-h-screen bg-gray-50">
     <!-- Loading Indicator -->
     <div wire:loading class="fixed top-0 left-0 w-full h-1 bg-blue-500 animate-pulse z-50"></div>
     
@@ -201,4 +202,5 @@
 
     <!-- Receipt Modal -->
     <livewire:pos.receipt-modal />
+    </div>
 </div>

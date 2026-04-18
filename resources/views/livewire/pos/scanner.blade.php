@@ -1,4 +1,5 @@
-<div class="h-screen flex flex-col bg-gray-50">
+<div>
+    <div class="h-screen flex flex-col bg-gray-50">
     <!-- Header - Sticky -->
     <div class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-20 safe-top">
         <div class="px-4 py-3">
@@ -292,4 +293,5 @@
             });
         });
     </script>
+    </div>
 </div>
