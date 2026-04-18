@@ -1,192 +1,258 @@
-<div class="h-screen flex flex-col bg-gray-100">
-    {{-- Header --}}
-    <div class="bg-white shadow p-4">
-        <div class="flex justify-between items-center">
-            <h1 class="text-xl font-bold">POS - {{ $currentTenant->name ?? 'Kasir' }}</h1>
-            <div class="text-sm text-gray-600">
-                {{ now()->format('d M Y H:i') }} WIB
+<div class="h-screen flex flex-col bg-gray-50">
+    <!-- Header - Sticky -->
+    <div class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-20 safe-top">
+        <div class="px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-lg sm:text-xl font-bold text-gray-900 flex items-center">
+                        <i class="fas fa-cash-register text-blue-600 mr-2"></i>
+                        POS
+                    </h1>
+                    <p class="text-xs sm:text-sm text-gray-600">{{ $currentTenant->name ?? 'Kasir' }}</p>
+                </div>
+                <div class="text-right">
+                    <div class="text-xs text-gray-500">
+                        <i class="far fa-clock mr-1"></i>{{ now()->format('H:i') }} WIB
+                    </div>
+                    <div class="text-xs text-gray-500">{{ now()->format('d M Y') }}</div>
+                </div>
             </div>
         </div>
     </div>
 
-    {{-- Barcode Scanner Input (Hidden) --}}
-    <div class="p-4">
-        <input type="text" 
-               id="barcode-input" 
-               wire:model="barcode" 
-               class="w-full p-4 text-lg border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
-               placeholder="Scan barcode di sini..."
-               autofocus
-               x-ref="barcodeInput"
-               wire:keydown.enter="addToCart($event.target.value)"
-               x-init="$refs.barcodeInput.focus()">
-    </div>
-
-    {{-- Cart Items --}}
-    <div class="flex-1 overflow-y-auto p-4">
-        <div class="bg-white rounded-lg shadow overflow-hidden">
-            <table class="w-full">
-                <thead class="bg-gray-50 border-b">
-                    <tr>
-                        <th class="p-3 text-left">Produk</th>
-                        <th class="p-3 text-center w-24">Qty</th>
-                        <th class="p-3 text-right w-32">Harga</th>
-                        <th class="p-3 text-right w-32">Total</th>
-                        <th class="p-3 text-center w-16"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($cartItems as $item)
-                    <tr class="border-b">
-                        <td class="p-3">
-                            <div class="font-medium">{{ $item->product->name }}</div>
-                            <div class="text-sm text-gray-500">{{ $item->product->barcode }}</div>
-                        </td>
-                        <td class="p-3">
-                            <div class="flex items-center justify-center">
-                                <button wire:click="updateQuantity({{ $item->id }}, {{ $item->quantity - 1 }})" 
-                                        class="w-8 h-8 bg-gray-200 rounded-l">-</button>
-                                <input type="number" 
-                                       value="{{ $item->quantity }}" 
-                                       class="w-12 h-8 text-center border-t border-b"
-                                       min="1"
-                                       readonly>
-                                <button wire:click="updateQuantity({{ $item->id }}, {{ $item->quantity + 1 }})" 
-                                        class="w-8 h-8 bg-gray-200 rounded-r">+</button>
-                            </div>
-                        </td>
-                        <td class="p-3 text-right">Rp {{ number_format($item->unit_price, 0, ',', '.') }}</td>
-                        <td class="p-3 text-right font-medium">Rp {{ number_format($item->quantity * $item->unit_price, 0, ',', '.') }}</td>
-                        <td class="p-3 text-center">
-                            <button wire:click="removeItem({{ $item->id }})" class="text-red-500">&times;</button>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="5" class="p-8 text-center text-gray-500">
-                            Keranjang kosong. Scan barcode untuk memulai.
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
+    <!-- Barcode Scanner Input -->
+    <div class="px-4 py-3 bg-white border-b border-gray-200">
+        <div class="relative">
+            <i class="fas fa-barcode absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            <input type="text" 
+                   id="barcode-input" 
+                   wire:model="barcode" 
+                   class="w-full pl-10 pr-4 py-3 text-base border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+                   placeholder="Scan atau ketik barcode..."
+                   autofocus
+                   x-ref="barcodeInput"
+                   wire:keydown.enter="addToCart($event.target.value)"
+                   x-init="$refs.barcodeInput.focus()">
         </div>
+        <p class="text-xs text-gray-400 mt-1">
+            <i class="fas fa-info-circle mr-1"></i>Scan barcode atau ketik manual lalu tekan Enter
+        </p>
     </div>
 
-    {{-- Footer --}}
-    <div class="bg-white shadow-lg p-4">
-        <div class="flex justify-between items-center mb-4">
-            <div>
-                <span class="text-gray-600">Total Item:</span>
-                <span class="font-bold text-lg ml-2">{{ $totalItems }}</span>
+    <!-- Cart Items - Scrollable -->
+    <div class="flex-1 overflow-y-auto px-4 py-3 scrollbar-hide">
+        @if(count($cartItems) > 0)
+            <div class="space-y-3">
+                @foreach($cartItems as $item)
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-4">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-semibold text-gray-900 text-sm sm:text-base truncate">
+                                {{ $item->product->name }}
+                            </h3>
+                            <p class="text-xs text-gray-500 font-mono mt-0.5">
+                                {{ $item->product->barcode }}
+                            </p>
+                            <p class="text-sm text-blue-600 font-medium mt-1">
+                                Rp {{ number_format($item->unit_price, 0, ',', '.') }}
+                            </p>
+                        </div>
+                        <button wire:click="removeItem({{ $item->id }})" 
+                                class="p-2 text-red-500 hover:bg-red-50 rounded-lg tap-target">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center justify-between mt-3">
+                        <div class="flex items-center bg-gray-100 rounded-lg">
+                            <button wire:click="updateQuantity({{ $item->id }}, {{ $item->quantity - 1 }})" 
+                                    class="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-200 rounded-l-lg tap-target">
+                                <i class="fas fa-minus text-sm"></i>
+                            </button>
+                            <span class="w-12 text-center font-medium text-gray-900">{{ $item->quantity }}</span>
+                            <button wire:click="updateQuantity({{ $item->id }}, {{ $item->quantity + 1 }})" 
+                                    class="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-200 rounded-r-lg tap-target">
+                                <i class="fas fa-plus text-sm"></i>
+                            </button>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xs text-gray-500">Subtotal</p>
+                            <p class="font-bold text-gray-900">
+                                Rp {{ number_format($item->quantity * $item->unit_price, 0, ',', '.') }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
             </div>
-            <div>
-                <span class="text-gray-600">Subtotal:</span>
-                <span class="font-bold text-2xl ml-2 text-blue-600">Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
+        @else
+            <div class="flex flex-col items-center justify-center h-64 text-gray-400">
+                <i class="fas fa-shopping-cart text-5xl mb-3 opacity-50"></i>
+                <p class="text-base">Keranjang kosong</p>
+                <p class="text-sm mt-1">Scan barcode untuk menambah produk</p>
             </div>
-        </div>
-        
-        <div class="flex space-x-3">
-            <button wire:click="clearCart" 
-                    class="flex-1 py-3 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300"
-                    @if($totalItems === 0) disabled @endif>
-                Kosongkan
-            </button>
-            <button wire:click="openPaymentModal" 
-                    class="flex-1 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700"
-                    @if($totalItems === 0) disabled @endif>
-                Bayar (Rp {{ number_format($subtotal, 0, ',', '.') }})
-            </button>
-        </div>
+        @endif
     </div>
 
-    {{-- Payment Modal --}}
-    @if($showPaymentModal)
-    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" wire:click="$set('showPaymentModal', false)">
-        <div class="bg-white rounded-lg w-96 p-6" wire:click.stop>
-            <h2 class="text-xl font-bold mb-4">Pembayaran</h2>
+    <!-- Footer - Sticky -->
+    <div class="bg-white border-t border-gray-200 safe-bottom sticky bottom-0 z-20">
+        <div class="px-4 py-4">
+            <!-- Summary -->
+            <div class="flex justify-between items-center mb-3">
+                <div>
+                    <p class="text-sm text-gray-500">Total Item</p>
+                    <p class="text-xl font-bold text-gray-900">{{ $totalItems }}</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm text-gray-500">Subtotal</p>
+                    <p class="text-2xl font-bold text-blue-600">Rp {{ number_format($subtotal, 0, ',', '.') }}</p>
+                </div>
+            </div>
             
-            <div class="mb-4">
-                <label class="block text-gray-700 mb-2">Total Tagihan</label>
-                <div class="text-2xl font-bold text-blue-600">Rp {{ number_format($subtotal, 0, ',', '.') }}</div>
+            <!-- Action Buttons -->
+            <div class="grid grid-cols-2 gap-3">
+                <button wire:click="clearCart" 
+                        class="py-3 px-4 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition tap-target"
+                        @if($totalItems === 0) disabled @endif>
+                    <i class="fas fa-trash mr-2"></i>Kosongkan
+                </button>
+                <button wire:click="openPaymentModal" 
+                        class="py-3 px-4 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition tap-target"
+                        @if($totalItems === 0) disabled @endif>
+                    <i class="fas fa-credit-card mr-2"></i>Bayar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    @if($showPaymentModal)
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-50" 
+         wire:click="$set('showPaymentModal', false)">
+        <div class="bg-white w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl p-6 safe-bottom" 
+             wire:click.stop>
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-900">Pembayaran</h2>
+                <button wire:click="$set('showPaymentModal', false)" class="p-2 text-gray-400 hover:text-gray-600 tap-target">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="bg-gray-50 rounded-xl p-4 mb-4">
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-600">Total Tagihan</span>
+                    <span class="text-2xl font-bold text-blue-600">Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
+                </div>
             </div>
 
             <div class="mb-4">
-                <label class="block text-gray-700 mb-2">Metode Pembayaran</label>
-                <select wire:model.live="paymentMethod" class="w-full p-2 border rounded">
-                    <option value="cash">Tunai</option>
-                    <option value="transfer">Transfer Bank</option>
-                    <option value="qris">QRIS</option>
-                </select>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Metode Pembayaran</label>
+                <div class="grid grid-cols-3 gap-2">
+                    <label class="flex items-center justify-center p-3 border rounded-xl cursor-pointer tap-target
+                                  {{ $paymentMethod === 'cash' ? 'border-blue-500 bg-blue-50' : 'border-gray-200' }}">
+                        <input type="radio" wire:model.live="paymentMethod" value="cash" class="sr-only">
+                        <i class="fas fa-money-bill-wave mr-2 {{ $paymentMethod === 'cash' ? 'text-blue-600' : 'text-gray-400' }}"></i>
+                        <span>Tunai</span>
+                    </label>
+                    <label class="flex items-center justify-center p-3 border rounded-xl cursor-pointer tap-target
+                                  {{ $paymentMethod === 'transfer' ? 'border-blue-500 bg-blue-50' : 'border-gray-200' }}">
+                        <input type="radio" wire:model.live="paymentMethod" value="transfer" class="sr-only">
+                        <i class="fas fa-university mr-2 {{ $paymentMethod === 'transfer' ? 'text-blue-600' : 'text-gray-400' }}"></i>
+                        <span>Transfer</span>
+                    </label>
+                    <label class="flex items-center justify-center p-3 border rounded-xl cursor-pointer tap-target
+                                  {{ $paymentMethod === 'qris' ? 'border-blue-500 bg-blue-50' : 'border-gray-200' }}">
+                        <input type="radio" wire:model.live="paymentMethod" value="qris" class="sr-only">
+                        <i class="fas fa-qrcode mr-2 {{ $paymentMethod === 'qris' ? 'text-blue-600' : 'text-gray-400' }}"></i>
+                        <span>QRIS</span>
+                    </label>
+                </div>
             </div>
 
             @if($paymentMethod === 'cash')
             <div class="mb-4">
-                <label class="block text-gray-700 mb-2">Jumlah Bayar</label>
-                <input type="number" 
-                       wire:model.live="paymentAmount" 
-                       class="w-full p-2 border rounded text-lg"
-                       placeholder="Masukkan jumlah bayar"
-                       min="{{ $subtotal }}">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Jumlah Bayar</label>
+                <div class="relative">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">Rp</span>
+                    <input type="number" 
+                           wire:model.live="paymentAmount" 
+                           class="w-full pl-12 pr-4 py-3 text-lg border-2 border-gray-200 rounded-xl focus:border-blue-500 outline-none"
+                           placeholder="0"
+                           min="{{ $subtotal }}">
+                </div>
                 
                 @if($paymentAmount > 0)
-                <div class="mt-2 text-lg">
-                    <span class="text-gray-600">Kembalian:</span>
-                    <span class="font-bold ml-2 {{ $changeAmount >= 0 ? 'text-green-600' : 'text-red-600' }}">
-                        Rp {{ number_format($changeAmount, 0, ',', '.') }}
-                    </span>
+                <div class="mt-3 p-3 bg-gray-50 rounded-xl">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Kembalian</span>
+                        <span class="text-xl font-bold {{ $changeAmount >= 0 ? 'text-green-600' : 'text-red-600' }}">
+                            Rp {{ number_format($changeAmount, 0, ',', '.') }}
+                        </span>
+                    </div>
                 </div>
                 @endif
             </div>
             @endif
 
-            <div class="flex space-x-3">
-                <button wire:click="$set('showPaymentModal', false)" 
-                        class="flex-1 py-2 bg-gray-200 rounded">
-                    Batal
-                </button>
-                <button wire:click="processPayment" 
-                        class="flex-1 py-2 bg-green-600 text-white rounded"
-                        @if($paymentMethod === 'cash' && $paymentAmount < $subtotal) disabled @endif>
-                    Proses
-                </button>
-            </div>
+            <button wire:click="processPayment" 
+                    class="w-full py-4 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition tap-target"
+                    @if($paymentMethod === 'cash' && $paymentAmount < $subtotal) disabled @endif>
+                <i class="fas fa-check-circle mr-2"></i>Proses Pembayaran
+            </button>
         </div>
     </div>
     @endif
 
-    {{-- Quick Add Product Modal --}}
+    <!-- Quick Add Product Modal -->
     @if($showQuickAddModal)
-    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" wire:click="$set('showQuickAddModal', false)">
-        <div class="bg-white rounded-lg w-96 p-6" wire:click.stop>
-            <h2 class="text-xl font-bold mb-4">Tambah Produk Baru</h2>
-            <p class="text-sm text-gray-600 mb-4">Barcode: {{ $newProductBarcode }}</p>
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-50"
+         wire:click="$set('showQuickAddModal', false)">
+        <div class="bg-white w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl p-6 safe-bottom"
+             wire:click.stop>
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-900">Tambah Produk Baru</h2>
+                <button wire:click="$set('showQuickAddModal', false)" class="p-2 text-gray-400 hover:text-gray-600 tap-target">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
             
-            <div class="mb-3">
-                <label class="block text-gray-700 mb-1">Nama Produk</label>
-                <input type="text" wire:model="newProductName" class="w-full p-2 border rounded">
-                @error('newProductName') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+            <div class="bg-blue-50 rounded-xl p-3 mb-4">
+                <p class="text-sm text-blue-800">Barcode: <span class="font-mono font-bold">{{ $newProductBarcode }}</span></p>
+            </div>
+            
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nama Produk</label>
+                    <input type="text" wire:model="newProductName" 
+                           class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 outline-none"
+                           placeholder="Contoh: Indomie Goreng">
+                    @error('newProductName') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Harga Beli (Rp)</label>
+                    <input type="number" wire:model="newProductCostPrice" 
+                           class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 outline-none"
+                           placeholder="0">
+                    @error('newProductCostPrice') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Harga Jual (Rp)</label>
+                    <input type="number" wire:model="newProductSellingPrice" 
+                           class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 outline-none"
+                           placeholder="0">
+                    @error('newProductSellingPrice') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+                </div>
             </div>
 
-            <div class="mb-3">
-                <label class="block text-gray-700 mb-1">Harga Beli</label>
-                <input type="number" wire:model="newProductCostPrice" class="w-full p-2 border rounded">
-                @error('newProductCostPrice') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-            </div>
-
-            <div class="mb-4">
-                <label class="block text-gray-700 mb-1">Harga Jual</label>
-                <input type="number" wire:model="newProductSellingPrice" class="w-full p-2 border rounded">
-                @error('newProductSellingPrice') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-            </div>
-
-            <div class="flex space-x-3">
+            <div class="grid grid-cols-2 gap-3 mt-6">
                 <button wire:click="$set('showQuickAddModal', false)" 
-                        class="flex-1 py-2 bg-gray-200 rounded">
+                        class="py-3 px-4 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition tap-target">
                     Batal
                 </button>
                 <button wire:click="quickAddProduct" 
-                        class="flex-1 py-2 bg-blue-600 text-white rounded">
+                        class="py-3 px-4 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition tap-target">
                     Simpan
                 </button>
             </div>
@@ -194,7 +260,10 @@
     </div>
     @endif
 
-    {{-- Alpine.js for auto-focus --}}
+    <!-- Receipt Modal -->
+    <livewire:pos.receipt-modal />
+
+    <!-- Scripts -->
     <script>
         document.addEventListener('livewire:initialized', () => {
             Livewire.on('cart-updated', () => {
@@ -223,7 +292,4 @@
             });
         });
     </script>
-
-    {{-- Receipt Modal --}}
-    <livewire:pos.receipt-modal />
 </div>
